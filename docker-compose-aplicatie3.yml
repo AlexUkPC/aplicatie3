@@ -1,0 +1,29 @@
+version: "3"  # optional since v1.27.0
+services:
+  web_aplicatie3:
+    image: alexrogna/aplicatie3_web:prod
+    expose:
+      - 3000
+    env_file:
+      - .env/production/database_aplicatie3
+      - .env/production/web_aplicatie3
+    environment:
+      - "VIRTUAL_HOST=aplicatie3.alexrogna.com"
+    restart: always
+
+  database_aplicatie3:
+    image: postgres
+    env_file:
+      - .env/production/database_aplicatie3
+    volumes:
+      - db_data_aplicatie3:/var/lib/postgresql/data
+    restart: always
+    
+  db-migrator_aplicatie3:
+    image: alexrogna/aplicatie3_web:prod
+    command: ["./wait-for", "--timeout=300", "database_aplicatie3:5432", "--", "bin/rails", "db:create" , "db:migrate"]
+    env_file:
+      - .env/production/database_aplicatie3
+      - .env/production/web_aplicatie3
+volumes:
+  db_data_aplicatie3:
